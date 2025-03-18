@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso ao Documento</title>
+    <script>
+        // Função para verificar a conexão e redirecionar
+        function verificarConexao(matricula) {
+            const linkDrive = `https://drive.google.com/file/d/${matricula}/view?usp=sharing`; // Link do Google Drive baseado na matrícula
+            const linkGitHub = `https://raw.githubusercontent.com/LeticiaC16/treinamento/refs/heads/main/cartao_${matricula}.txt`; // Link do GitHub (RAW .txt)
+
+            if (navigator.onLine) {
+                // Se estiver online, abre o arquivo do Google Drive (PDF/PNG)
+                window.location.href = linkDrive;
+            } else {
+                // Se estiver offline, abre o arquivo raw do GitHub (.txt)
+                document.getElementById('offline').style.display = 'block';
+                document.getElementById('linkOffline').innerText = linkGitHub;
+            }
+        }
+
+        // Chama a função para o exemplo de matrícula
+        function iniciar() {
+            const matricula = '310'; // Altere a matrícula conforme o arquivo desejado
+            verificarConexao(matricula);
+        }
+    </script>
+</head>
+<body onload="iniciar()">
+    <h1>Documento</h1>
+    <p>Se estiver offline, copie o link salvo ou envie por SMS:</p>
+
+    <div id="offline" style="display: none;">
+        <p><strong>Link salvo:</strong> <span id="linkOffline"></span></p>
+        <button onclick="copiarParaAreaDeTransferencia()">Copiar Link</button>
+        <br><br>
+        <input type="tel" id="numeroTelefone" placeholder="Digite o número p/ SMS">
+        <button onclick="enviarPorSMS()">Enviar por SMS</button>
+    </div>
+</body>
+</html>
