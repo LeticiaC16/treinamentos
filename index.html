@@ -5,29 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Documento</title>
     <script>
-        // Função para verificar a conexão e redirecionar
-        function verificarConexao(matricula) {
-            const linkDrive = `https://drive.google.com/file/d/${matricula}/view?usp=sharing`; // Link do Google Drive baseado na matrícula
-            const linkGitHub = `https://raw.githubusercontent.com/LeticiaC16/treinamento/refs/heads/main/cartao_${matricula}.txt`; // Link do GitHub (RAW .txt)
+        // Função que gera os links para o PDF e TXT baseado na matrícula
+        function gerarLinks(matricula) {
+            // Gera o link para o PDF armazenado no Google Drive
+            const linkPDF = `https://drive.google.com/uc?export=download&id=ID_DO_ARQUIVO_PDF_${matricula}`;
+
+            // Gera o link para o arquivo TXT no GitHub
+            const linkTXT = `https://raw.githubusercontent.com/LeticiaC16/treinamento/main/cartao_${matricula}.txt`;
+
+            return { linkPDF, linkTXT };
+        }
+
+        // Função que verifica se está online ou offline
+        function verificarConexao() {
+            // Exemplo de matrícula que pode ser alterada dinamicamente
+            const matricula = "282"; // Substitua por uma matrícula específica ou busque essa informação de outra forma
+
+            const { linkPDF, linkTXT } = gerarLinks(matricula);
 
             if (navigator.onLine) {
-                // Se estiver online, abre o arquivo do Google Drive (PDF/PNG)
-                window.location.href = linkDrive;
+                // Se estiver online, acessa o PDF
+                localStorage.setItem("documentoOffline", linkPDF);
+                window.location.href = linkPDF;
             } else {
-                // Se estiver offline, abre o arquivo raw do GitHub (.txt)
-                document.getElementById('offline').style.display = 'block';
-                document.getElementById('linkOffline').innerText = linkGitHub;
+                // Se estiver offline, abre o arquivo TXT do GitHub
+                const linkSalvo = localStorage.getItem("documentoOffline");
+                if (linkSalvo) {
+                    document.getElementById('offline').style.display = 'block';
+                    document.getElementById('linkOffline').innerText = linkTXT; // Exibe o link do TXT
+                } else {
+                    alert("Sem internet e sem acesso prévio ao documento!");
+                }
             }
         }
 
-        // Chama a função para o exemplo de matrícula
-        function iniciar() {
-            const matricula = '310'; // Altere a matrícula conforme o arquivo desejado
-            verificarConexao(matricula);
+        // Função para copiar o link
+        function copiarParaAreaDeTransferencia() {
+            const texto = document.getElementById('linkOffline').innerText;
+            navigator.clipboard.writeText(texto).then(function() {
+                alert("Link copiado!");
+            });
+        }
+
+        // Função para enviar o link por SMS
+        function enviarPorSMS() {
+            const numero = document.getElementById('numeroTelefone').value;
+            const linkSalvo = localStorage.getItem("documentoOffline") || "";
+
+            if (numero) {
+                const smsLink = `sms:${numero}?body=Link do documento: ${encodeURIComponent(linkSalvo)}`;
+                window.location.href = smsLink;
+            } else {
+                alert("Digite um número de telefone!");
+            }
         }
     </script>
 </head>
-<body onload="iniciar()">
+<body onload="verificarConexao()">
     <h1>Documento</h1>
     <p>Se estiver offline, copie o link salvo ou envie por SMS:</p>
 
@@ -40,3 +74,5 @@
     </div>
 </body>
 </html>
+
+
